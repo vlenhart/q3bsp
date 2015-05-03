@@ -236,7 +236,7 @@ void VertexMesh::SaveVRML2(
 			}
 			if (mSections.size() >0) {
 				
-				fprintf(fph,"]}\n");
+				fprintf(fph,"\n]\n}\n");
 			}
 			
 		}
@@ -326,7 +326,7 @@ void VertexSection::SaveVRML(FILE *fph,bool tex1)
 
   if ( 1 )
   {
-    fprintf(fph,"  IndexedFaceSet { coordIndex [\n");
+    fprintf(fph,"  IndexedFaceSet {\ncoordIndex [\n");
     UShortVector::iterator j= mIndices.begin();
     for (int i=0; i<tcount; i++)
     {
@@ -370,13 +370,13 @@ void VertexPool::SaveVRML(FILE *fph,bool tex1)
 {
   if ( 1 )
   {
-    fprintf(fph,"  Coordinate3 { point [\n");
+    fprintf(fph,"  Coordinate3 {\npoint [\n");
     int count = mVtxs.size();
     for (int i=0; i<count; i++)
     {
       const LightMapVertex &vtx = mVtxs[i];
       if ( i == (count-1) )
-        fprintf(fph,"  %f %f %f]\n",vtx.mPos.x,vtx.mPos.y,vtx.mPos.z);
+        fprintf(fph,"  %f %f %f\n]\n",vtx.mPos.x,vtx.mPos.y,vtx.mPos.z);
       else
         fprintf(fph,"  %f %f %f,\n",vtx.mPos.x,vtx.mPos.y,vtx.mPos.z);
     }
@@ -384,7 +384,7 @@ void VertexPool::SaveVRML(FILE *fph,bool tex1)
   }
   if ( 1 )
   {
-    fprintf(fph,"  TextureCoordinate2 { point [\n");
+    fprintf(fph,"  TextureCoordinate2 {\npoint [\n");
     int count = mVtxs.size();
 
     for (int i=0; i<count; i++)
@@ -394,14 +394,14 @@ void VertexPool::SaveVRML(FILE *fph,bool tex1)
       if ( !tex1 ) // if saving second U/V channel.
       {
         if ( i == (count-1) )
-          fprintf(fph,"  %f %f]\n",vtx.mTexel2.x,1.0f-vtx.mTexel2.y);
+          fprintf(fph,"  %f %f\n]\n",vtx.mTexel2.x,1.0f-vtx.mTexel2.y);
         else
           fprintf(fph,"  %f %f,\n",vtx.mTexel2.x,1.0f-vtx.mTexel2.y);
       }
       else
       {
         if ( i == (count-1) )
-          fprintf(fph,"  %f %f]\n",vtx.mTexel1.x,1.0f-vtx.mTexel1.y);
+          fprintf(fph,"  %f %f\n]\n",vtx.mTexel1.x,1.0f-vtx.mTexel1.y);
         else
           fprintf(fph,"  %f %f,\n",vtx.mTexel1.x,1.0f-vtx.mTexel1.y);
       }
@@ -568,7 +568,7 @@ void VertexSection::SaveVRML2(FILE *fph,VFormatOptions &options)
 		
 		  
 		  if (options.useMultiTexturing) {
-			  fprintf(fph,"MultiTexture { materialColor TRUE texture [\n");
+			  fprintf(fph,"MultiTexture {\nmaterialColor TRUE texture [\n");
 			  tex1 = true;
 		
 		  if (mShader) {
@@ -583,7 +583,7 @@ void VertexSection::SaveVRML2(FILE *fph,VFormatOptions &options)
 
 				if (stage.isAnimMap) {
 					if (options.useEffects) {
-						fprintf(fph,"DEF MAP AnimMap { frequency %f textures [\n",stage.animMapFrequency);
+						fprintf(fph,"DEF MAP AnimMap {\nfrequency %f textures [\n",stage.animMapFrequency);
 						for (int i=0; i<stage.animMap.size(); i++)
 							WriteImageTexture(fph,stage.animMap[i],options,false,stage.clamp);
 
@@ -678,7 +678,7 @@ void VertexSection::SaveVRML2(FILE *fph,VFormatOptions &options)
 					const char *modeOk = stage.tcmodOk.c_str();
 
 					if (stage.tcmod.length()>0 || stage.tcmodOk.length()>0 ) {
-					   fprintf(fph,"DEF TC%d TcMod { \n",i);
+					   fprintf(fph,"DEF TC%d TcMod {\n",i);
 
 					   if (stage.tcmodOk.length()>0)
 						   fprintf(fph,"\t%s\n", modeOk);
@@ -773,15 +773,14 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
   
   if ( 1 )
   {
-    fprintf(fph,"coord Coordinate { point [\n\t");
+    fprintf(fph,"coord Coordinate {\npoint [\n\t");
     int count = mVtxs.size();
     for (int i=0; i<count; i++)
     {
       const LightMapVertex &vtx = mVtxs[i];
 	  
 	  if (i>0) { 
-			if ( (i%4) == 0) fprintf(fph,",\n\t");
-			else fprintf(fph,",");
+			fprintf(fph,",\n\t");
 	  }		
 	   
       if (options.yzFlip)
@@ -789,15 +788,15 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
       else fprintf(fph,options.VFORMAT,vtx.mPos.x,vtx.mPos.y,vtx.mPos.z);
 
     }
-    fprintf(fph,"]}\n");
+    fprintf(fph,"\n]\n}\n");
   }
 
   if (options.useMultiTexturing) { // PROPOSAL MultiTextureCoodinate 
-    fprintf(fph,"texCoord  MultiTextureCoordinate { coord [\n\t");
+    fprintf(fph,"texCoord  MultiTextureCoordinate {\ncoord [\n\t");
     int count = mVtxs.size();
 
 	// channel 0
-    fprintf(fph,"\tTextureCoordinate { point [\n\t");
+    fprintf(fph,"\tTextureCoordinate {\npoint [\n\t");
 
 
     for (int i=0; i<count; i++)
@@ -813,13 +812,13 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
       else fprintf(fph,options.TFORMAT,vtx.mTexel1.x,1.0f-vtx.mTexel1.y);
 
     }
-    fprintf(fph,"]}\n");
+    fprintf(fph,"\n]\n}\n");
 	
 	//if (lightMapStage == 1) 
 	{
 
 	// channel 1
-	fprintf(fph,"\tTextureCoordinate { point [\n\t");
+	fprintf(fph,"\tTextureCoordinate {\npoint [\n\t");
 
     for (int i=0; i<count; i++)
     {
@@ -833,23 +832,23 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
 		  fprintf(fph,options.TFORMAT,vtx.mTexel2.x,1.0f-vtx.mTexel2.y);
       else fprintf(fph,options.TFORMAT,vtx.mTexel1.x,1.0f-vtx.mTexel1.y);
 	}
-    fprintf(fph,"\t]}\n");
+    fprintf(fph,"\n\t]\n}\n");
 	
 	}
-    fprintf(fph,"]}\n");
+    fprintf(fph,"\n]\n}\n");
 
 
   } else	
-  if ( 1 )
+  if ( 0 ) // TODO(vlaube): only disabled because the vrml loader cannot parse textures
   {
-    fprintf(fph,"texCoord  TextureCoordinate { point [\n\t");
+    fprintf(fph,"texCoord  TextureCoordinate {\npoint [\n\t");
     int count = mVtxs.size();
 
     for (int i=0; i<count; i++)
     {
       const LightMapVertex &vtx = mVtxs[i];
 
-	  if (i>0) { 
+	  if (i>0) {
 			if ( (i%4) == 0) fprintf(fph,",\n\t");
 			else fprintf(fph,",");
 	  }		
@@ -864,15 +863,15 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
           fprintf(fph,options.TFORMAT,vtx.mTexel1.x,1.0f-vtx.mTexel1.y);
       }
     }
-    fprintf(fph,"]}\n");
+    fprintf(fph,"\n]\n}\n");
 
   }
 
    //if (options.useVertexColor) 
-   { 
+   {
     int count = mVtxs.size();
 	// channel 0
-    fprintf(fph,"\tcolor Color { color [\n\t");
+    fprintf(fph,"\tcolor Color {\ncolor [\n\t");
 
 
     for (int i=0; i<count; i++)
@@ -886,6 +885,6 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
       fprintf(fph,options.CFORMAT,vtx.mColor.x,vtx.mColor.y,vtx.mColor.z);
 
     }
-    fprintf(fph,"]}\n");
+    fprintf(fph,"\n]\n}\n");
    }
 }
