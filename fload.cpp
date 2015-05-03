@@ -38,7 +38,7 @@ Fload::Fload(const String& fname)
     if ( mLen )
     {
       fseek(fph, 0L, SEEK_SET);
-      mData = (void *) new unsigned char[mLen];
+      mData = (void *) new unsigned char[mLen+1];
       assert( mData );
       if ( mData )
       {
@@ -49,6 +49,7 @@ Fload::Fload(const String& fname)
           delete mData;
           mData = 0;
         }
+		((char *)mData)[mLen]=0;
       }
     }
     fclose(fph);

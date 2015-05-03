@@ -1,6 +1,6 @@
+							 Q3BSP v1.1
 
                              Q3BSP v1.0
-
 
                                 by
 
@@ -9,6 +9,12 @@
 
                       Open Sourced December 5, 2000
                            Merry Christmas
+
+						   v1.1 / VRML 97
+								by
+                           Holger Grahn
+							hg@x79.net
+
 
 Q3BSP is a Windows console application that will convert any valid
 Quake 3 BSP file into an organized polygon mesh and export the results
@@ -87,5 +93,115 @@ stringdict.cpp
 vector.h          Simple template class to represent a 3d data point.
 
 vformat.h         Class to create an organized mesh from a polygon soup.
-vformat.cpp       Also saves output into VRML 1.0
+vformat.cpp       Also saves output into VRML 1.0 & 2
 
+
+==================================================================================
+
+VRML 97 extension by Holger Grahn hg@x79.net.
+
+Using q3bsp -2 bspfile
+Two VRML 97 files are created, the lightmaps are stored in PNG format
+
+Using q3bsp -2m bspfile
+One VRML 97 is created using a MultiTexture NODE extensions, the lightmaps are stored in PNG format
+This extensions is supported by blaxxun Contact 5 VRML plugin.
+
+In the directory the file q3effects.wrl
+is copied into the output file.
+The additional option v puts the shader name as string after each Appearance.
+
+The project now includes the lastest libPNG & zlib libaries, the build configuration
+Win32 LIB debug & WIN32 LIB need to be build manually before building q3bsp.
+
+
+The output was tested the following way :
+
+get Quake3 or Quake3 team arena demo from 
+http://www.quake3arena.com/tademo/  
+http://www.quake3world.com/demo/teamarena.html
+
+rename demoq3/pak0.pk3 to demoq3/pak0.zip
+
+unzip bsp files, textures (jpg, tga) & shaders with path to some directory
+you now have :
+ dir/maps
+ dir/textures
+ dir/scripts
+
+ 
+ cd dir 
+
+ inside dir
+ 
+ run :  
+ q3bsp -2m maps\q3dm1
+ 
+ files are created in dir (wrl, light map PNG's)
+
+ referenced TGA files are automatically converted to PNG if not yet existing
+ 
+
+
+ToDo: 
+
+translating of more entities
+using q3 bsptree / pvs information
+Q3 shaders can have n textures,
+check & translate  shader properties like cull, blendMode etc
+
+I was trying to emulate some Q3 shader effects with multi texturing.
+Faces without a shader use two textures, light map & texture.
+
+Its still a problem to exactly reproduce q3 brightness.
+in v1.1 Vertex color are exported,
+a problem might be that the rgbgen keyword is not supported.
+
+
+Effect shaders can use up to 8 textures, with the current set of boards
+this effects are not possible to emulate.
+This would require Multipath rendering.
+For improvements see q3shader.cpp for shader parsing
+and vformat.cpp for shader conversion.
+
+New shader files need to manually insertd in q3shader.cpp
+
+
+q3links
+
+id Software
+===========
+http://www.idsoftware.com/
+http://www.quake3arena.com/
+
+
+Tools
+=====
+Map building
+q3map
+
+GtkRandiant
+http://www.qeradiant.com/
+http://quake3.qeradiant.com/
+
+q3ase Shader file editor 
+http://www.fileplanet.com/index.asp?file=56919
+
+
+Sites
+=====
+
+http://www.quake3world.com/
+http://www.planetquake.com/
+http://www.3ddownloads.com/
+
+Info & Resources for builders
+=============================
+http://www.quake3world.com/editing/
+http://www.planetquake.com/polycount/
+
+
+
+
+ 
+ 

@@ -33,7 +33,7 @@ public:
 
   inline StringRef(const char *str);
   inline StringRef(const String &str);
-	inline StringRef(const StringRef &str);
+  inline StringRef(const StringRef &str);
 
   operator const char *() const
   { 
@@ -46,6 +46,7 @@ public:
   };
 
   const char * Get(void) const { return mString; };
+  const char * c_str(void) const { return mString; };
 
   void Set(const char *str)
   {

@@ -24,13 +24,13 @@ class ArgList
 {
 public:
   ArgList( void );
-  ArgList( const String& line );
+  ArgList( const String& line);
   ~ArgList( void );
   ArgList( const ArgList& copy );
   ArgList& operator= ( const ArgList& copy );
   ArgList& operator= ( const String& line );
 
-  void Set( const String& line );
+  void Set( const String& line, bool untilNewLine = true );
 
   const String& operator[]( int argc ) const;
   String& operator[]( int argc );

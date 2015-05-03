@@ -26,6 +26,128 @@
 #include "rect.h"
 
 
+class QuakeShader;
+
+// mapping a shader texture to VRML ImageTexture DEF Name 
+typedef std::map< StringRef, StringRef > TextureDefMap;
+
+// mapping a shader to VRML Appearance DEF Name 
+typedef std::map< StringRef, StringRef > AppearanceDefMap;
+
+
+
+// VRML 2 export options
+class VFormatOptions {
+
+public :
+
+	// FOR DEF USE of nodes 
+	TextureDefMap textureDefMap;
+	AppearanceDefMap appearanceDefMap;
+	
+	// for creting DEF names 
+	int appearanceCount;
+	int textureCount;
+
+
+	bool vrml2;			// want VRML 2 output 
+	bool verbose;		// want verbose output
+
+	bool useMultiTexturing; // emit VRML Contact 3D MultiTexture proposed nodes
+	bool useBsp;			// emit BSP tree
+	bool tex1;		// if exporting 2 separate files the current path 
+	int maxStage;		// max number of stages 
+	bool usePng; // use PNG format for images, else BMP
+	bool useLighting; // emit VRML 2 unlit geometry 
+	bool useMat; // dim world using mat emissive color
+	bool useEffects; // emit special effects 
+	bool yzFlip; // true VRML Y <=> Z 
+
+	// printf format for vertex coordinates
+	const char * VFORMAT;
+
+	// printf format for texture coordinates
+	const char * TFORMAT;
+
+	// printf format for vertex colors
+	const char * CFORMAT;
+
+	// the default light map blending mode 
+	const char *blendMode;
+	const char *stage0Mode;
+	const char *lightMapMode;
+
+	bool matDefined;
+
+	VFormatOptions() {
+		appearanceCount=0;
+		textureCount=0;
+		matDefined = false;
+
+		vrml2=true;
+		verbose=false;
+		useBsp=false;
+
+		useEffects=true;
+
+		usePng = true; // use PNG format for lightmap-images, else BMP
+		useLighting = false; // emit VRML 2 unlit geometry 
+		useMat = false;
+
+		useMultiTexturing = false; // emit VRML Contact 3D MultiTexture proposed nodes
+
+		maxStage=8;
+		yzFlip = true; // true VRML Y <=> Z 
+
+		//VFORMAT ="%f %f %f";
+		VFORMAT = "%g %g %g";
+		TFORMAT  = "%g %g";
+		CFORMAT = "%.3f %.3f %.3f";
+
+		useMat = true;
+
+		if (useMat) blendMode = "mode [\"MODULATE\" \"ADD\" ]";
+		else blendMode = "mode [\"REPLACE\" \"MODULATE\" ]";
+		//blendMode = "mode [\"MODULATE\" \"MODULATE\" ]"; // too dark
+		//blendMode = "mode [\"MODULATE\" \"ADDSIGNED\" ]";
+
+		if (useMat) blendMode = "mode [\"DIFFUSE_ADD,SELECTARG2\" \"MODULATE\" ]";
+
+		stage0Mode= "MODULATE";
+		lightMapMode = "MODULATE";
+
+	};
+
+	// map from quake to float coordinates 
+	void MapVertex (float v[3]) 
+	{
+    
+		const float recip = (1.0f/45.0f);
+
+		v[0]*=recip;
+		float tmp=v[1];
+		v[1]=v[2]*recip;
+		v[2]=tmp * -recip;
+	}
+
+	// map a plane normal
+	// fix me 
+	void MapVector(const float v[3],float vout[3]) 
+	{
+    
+		const float recip = (45.0f/1.0f);
+
+		vout[0]=v[0]*recip;
+		float tmp=v[1];
+		vout[1]=v[2]*recip;
+		vout[2]=tmp * -recip;
+	}
+
+
+};
+
+
+
 class LightMapVertex
 {
 public:
@@ -53,6 +175,7 @@ public:
     mPos.Lerp(a.mPos,b.mPos,p);
     mTexel1.Lerp(a.mTexel1,b.mTexel1,p);
     mTexel2.Lerp(a.mTexel2,b.mTexel2,p);
+    mColor.Lerp(a.mColor,b.mColor,p);
   };
 
   void Set(int index,const float *pos,const float *texel1,const float *texel2)
@@ -74,6 +197,7 @@ public:
   Vector3d<float> mPos;
   Vector2d<float> mTexel1;
   Vector2d<float> mTexel2;
+  Vector3d<float> mColor;
 
 };
 
@@ -167,6 +291,7 @@ public:
 
 
   void SaveVRML(FILE *fph,bool tex1);
+  void SaveVRML2(FILE *fph,int lightMapStage, VFormatOptions &options);
 
 private:
   VertexSet      mVertSet; // ordered list.
@@ -180,6 +305,7 @@ public:
   VertexSection(const StringRef &name)
   {
     mName = name;
+	mShader = NULL;
     mBound.InitMinMax();
   };
 
@@ -189,6 +315,10 @@ public:
 
 
   void SaveVRML(FILE *fph,bool tex1);
+  void SaveVRML2(FILE *fph,VFormatOptions &options);
+
+  void SetShader(QuakeShader	*shader) { mShader = shader; }
+  QuakeShader* GetShader(QuakeShader	*shader) { return mShader; }
 
 private:
 
@@ -198,9 +328,12 @@ private:
   Rect3d<float> mBound;
   UShortVector  mIndices;
   VertexPool    mPoints;
+  QuakeShader	*mShader; // tmp pointer to shader 
 };
 
 typedef std::map< StringRef, VertexSection * > VertexSectionMap;
+
+
 
 class VertexMesh
 {
@@ -221,9 +354,15 @@ public:
   void SaveVRML(const String &name,  // base file name
                 bool tex1) const;          // texture channel 1=(true)
 
+   void SaveVRML2(FILE *fph,
+                 VFormatOptions &options) const;   
+
+
+   // current section in progress 
+   VertexSection   *mLastSection;
+
 private:
   StringRef        mLastName;
-  VertexSection   *mLastSection;
   VertexSectionMap mSections;
   Rect3d<float>    mBound; // bounding region for whole mesh
 };

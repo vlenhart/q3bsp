@@ -1,0 +1,310 @@
+#VRML V2.0 utf8
+
+# q3effects.wrl V 1.0
+# some Quake 3 shader effects emulation
+# hg@x79.net
+#
+##### Effects Begin
+
+
+#### global effects timer 
+DEF	TIMER TimeSensor { loop	TRUE cycleInterval 1.0 }
+
+# cycle through a list of texture
+PROTO AnimMap
+[
+	eventIn	SFFloat set_fraction 
+	field SFFloat frequency 1
+	field MFNode textures [] 
+	eventIn	SFTime set_time
+]
+{
+	DEF SW Switch {	# not VRML 97, use Switch to select texture
+		whichChoice	0
+		choice IS textures
+	}
+
+	DEF S Script {
+		
+		eventIn	SFFloat set_fraction  IS set_fraction
+		eventIn	SFTime set_time  IS set_time
+
+		eventOut SFInt32 choice_changed  
+		
+		field SFFloat frequency IS frequency
+		field MFNode textures IS textures
+
+		url	"javascript:
+		function set_fraction(f) 
+		{
+
+			f = f*frequency / textures.length;
+			f-= Math.floor(f);
+			f= f* textures.length;
+			//print(f);
+			choice_changed = f;
+		}	
+		function set_time(f) 
+		{
+
+			f = f*frequency / textures.length;
+			f-= Math.floor(f);
+			f= f* textures.length;
+			//print(f);
+			choice_changed = f;
+		}	
+
+		"
+
+	}
+	ROUTE  S.choice_changed	TO SW.whichChoice
+
+}
+
+
+# Contact Extension Node definitions 
+EXTERNPROTO MultiTexture[
+	exposedField SFBool materialColor
+	exposedField SFBool materialAlpha
+	exposedField MFString mode
+	exposedField MFString type
+	exposedField MFNode texture
+	exposedField MFNode textureTransform
+	exposedField MFInt32 textureOp
+	exposedField SFColor color
+	exposedField SFFloat alpha
+	]
+["urn:inet:blaxxun.com:node:MultiTexture","http://www.blaxxun.com/vrml/protos/nodes.wrl#MultiTexture","nodes.wrl#MultiTexture"]
+
+EXTERNPROTO TextureCoordGen[
+	exposedField SFString mode
+	exposedField MFFloat parameter
+	]
+["urn:inet:blaxxun.com:node:TextureCoordGen","http://www.blaxxun.com/vrml/protos/nodes.wrl#TextureCoordGen","nodes.wrl#TextureCoordGen"]
+
+EXTERNPROTO MultiTextureCoordinate[
+	exposedField MFNode coord
+	]
+["urn:inet:blaxxun.com:node:MultiTextureCoordinate","http://www.blaxxun.com/vrml/protos/nodes.wrl#MultiTextureCoordinate","nodes.wrl#MultiTextureCoordinate"]
+
+EXTERNPROTO DrawOp[
+	exposedField MFInt32 op
+	exposedField MFFloat args 
+]
+["urn:inet:blaxxun.com:node:DrawOp","http://www.blaxxun.com/vrml/protos/nodes.wrl#DrawOp","nodes.wrl#DrawOp"]
+
+#tcmod scroll 0 2
+#tcMod stretch sin 1.2 .8 0 1.5
+#tcMod stretch sin 1.2 .8 0 1.5
+#tcMod rotate 40
+#tcMod scale 2 2
+# tcMod turb 0 .1 0 .01
+
+PROTO rgbgen [
+	field SFFloat base 0
+	field SFFloat amplitude 1
+	field SFFloat phase	 0
+	field SFFloat frequency 1
+
+	eventIn	SFFloat set_fraction 
+	eventOut SFColor color
+
+]
+{
+	Script {
+
+		eventIn	SFFloat set_fraction  IS set_fraction
+		eventOut SFColor color IS color
+
+		field SFFloat base IS base
+		field SFFloat amplitude IS amplitude
+		field SFFloat phase IS phase
+		field SFFloat frequency	IS frequency
+
+		directOutput TRUE
+
+		url	"javascript:
+		function rgbgen(f) {
+			//<freq> 
+			f*=frequency;
+			f+=phase;
+
+			// sine 
+			y = base+amplitude*Math.sin(f*Math.PI*2);
+			// triangle
+			f= f-Math.floor(f);
+			if (f<=0.5) f=f*2; else f = 1 - 2*(f-0.5);
+
+			// saw sawtooth
+			f=f;
+			///Inversesawtooth
+			//f=1.0-f;
+			//Square
+			//if (f<=0.5) f=1; else f = -1;
+			//y=base+amplitude*f;
+			color= new SFColor(y,y,y);
+		}
+		function set_fraction(f) 
+		{
+			rgbgen(f);
+		}	
+
+		"
+
+	}
+
+}
+
+PROTO TcMod [
+
+	field SFString mode ""
+
+	field SFVec2f scale  1 1
+
+	field SFFloat rotate 0
+	field SFVec2f scroll 0 0
+
+	field SFInt32 func -1
+	field SFFloat base 0
+	field SFFloat amplitude 1
+	field SFFloat phase	 0
+	field SFFloat frequency 1
+
+	eventIn	SFFloat set_fraction 
+	eventIn	SFTime set_time
+
+]
+{
+	DEF TX TextureTransform {
+	#	scale  IS scale
+		center -0.5 -0.5
+	}
+
+	Script {
+		directOutput TRUE
+		field SFNode TX USE	TX 
+		
+		eventIn	SFFloat set_fraction  IS set_fraction
+		eventIn	SFTime set_time  IS set_time
+
+
+		field SFFloat angle IS rotate
+
+		field SFVec2f scale IS scale
+
+		field SFVec2f s IS scroll
+
+		field SFInt32 func IS func
+		field SFFloat base IS base
+		field SFFloat amplitude IS amplitude
+		field SFFloat phase IS phase
+		field SFFloat frequency	IS frequency
+
+		directOutput TRUE
+
+		url	"javascript:
+		// rotate <degrees per per second>
+		function rotate(f) { 	TX.rotation = f * angle * Math.PI*2; }
+		function scroll(f) 
+		{ 
+			 var x = s.x* f *scale.x;
+			 //x = x-Math.floor(x);
+			 var y = s.y* f *scale.y;
+			 //y = y-Math.floor(y);
+
+			 TX.translation.x=x;
+			 TX.translation.y=y;
+
+		}
+		// stretch <func> <base> <amplitude> <phase> <frequency>
+		
+		function stretch(f) 
+		{
+			f*=frequency;
+			f+=phase;
+			f=f-Math.floor(f);
+			
+			if (func== 0) // sine 
+				f = Math.sin(f*Math.PI*2);
+			else if (func == 1) {// triangle
+				if (f<=0.5) f=f*2; else f = 1 - 2*(f-0.5);
+			} else if (func == 2) {// saw sawtooth
+				f=f;
+			} else if (func == 3) {///Inversesawtooth
+				f=1.0-f;
+			} else if (func == 4) {//Square
+				if (f<=0.5) f=-1; else f = 1;
+			}
+			y=base+amplitude*f;
+			TX.scale.x = y;
+			TX.scale.y = y;
+		}
+
+		function set_fraction(f) 
+		{
+			if (angle!=0) rotate(f);
+			if (func>=0) stretch(f);
+			scroll(f);
+		}	
+		function set_time(f) 
+		{
+			TX.scale.x = 1.0/scale.x;
+			TX.scale.y = 1.0/scale.y;
+
+			if (angle!=0) rotate(f-Math.floor(f));
+			if (func>=0) stretch(f);
+			scroll(f-Browser.getWorldStartTime());
+		}	
+		"
+
+	}
+
+}
+Switch {
+	whichChoice	-1
+	choice [
+		DEF BLEND_ONE_ONE DrawOp { op [	  # equivalent TO ADD 
+				1 0 # zwrite off
+				2 4 # z-test le-equal 
+				6 1 # blend enable 
+				7 2 # src blend mode  ONE
+				8 2 # dst blend mode  ONE
+			]
+		}
+		DEF BLEND_RESET DrawOp { op [
+				1 1   # zwrite on
+				6 0   # blend enable off 
+				7  6  # src blend mode
+				8  5  # dst blend mode 
+			]
+		}
+		# global Material Node
+		DEF MAT Material {
+			#diffuseColor 1 1 1 we have problems with lighting
+			diffuseColor 0 0 0
+			emissiveColor 0.3 0.3 0.3
+		}
+
+		DEF MAT-UNLIT Material {
+			diffuseColor 0 0 0
+			emissiveColor 0.5 0.5 0.5
+		}
+
+
+	]
+}
+
+## for global brightness control 
+DEF SUNLIGHT DirectionalLight {
+	color	1 1 1
+	ambientIntensity	0.5
+	intensity 0.5
+	direction 1 1 1
+	on FALSE
+	
+}
+
+##### Effects End
+
+
+

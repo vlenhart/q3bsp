@@ -25,6 +25,8 @@
 #include "stringdict.h"
 #include "vector.h"
 
+class VFormatOptions;
+
 // Loads a quake3 bsp file.
 class Quake3BSP
 {
@@ -45,6 +47,22 @@ private:
   void ReadElements(const void *mem); // load indices for indexed primitives
   void ReadShaders(const void *mem); // names of the 'shaders' (i.e. texture)
 
+  // read the array of planes
+  void ReadPlanes(const void *mem);
+
+  // read the dnode_t nodes 
+  void ReadNodes(const void *mem);
+
+  // read the dleaf_t nodes 
+  void ReadLeaves(const void *mem);
+
+  // read the leaf surface indices
+  void ReadLeafSurfaces(const void *mem);
+
+
+  
+  void ReadEntities(const void *mem); // entities
+
   void BuildVertexBuffers(void);
 
   bool              mOk;       // quake BSP properly loaded.
@@ -57,6 +75,56 @@ private:
   UShortVector      mElements; // indices for draw primitives.
   Rect3d<float>     mBound;
   VertexMesh       *mMesh; // organized mesh
+
+  std::vector< dplane_t > mPlanes; // the planes 
+  std::vector< dnode_t > mNodes; // the nodes
+
+  std::vector<int>		mLeafSurfaces;
+  std::vector<int>		mLeafBrushes;
+
+  std::vector<dbrush_t > mBrushes;
+  std::vector<dbrushside_t > mBbrushSides;
+
+  std::vector< dleaf_t > mLeaves; // the leaves
+
+  EntityReferenceVector mEntities;	// list of entities
+
+public :
+
+  bool				mUsePng; // use PNG format for export
+  StringRef			mLmPrefix; // prefix used for light map files 
+
+
+  // save the entities 
+  void SaveEntitiesVRML2(
+			FILE *fph,
+            VFormatOptions &options) const ;
+
+  void SaveEntity(const EntityReference &entity,FILE *f,VFormatOptions &options) const;
+
+  // save the BSP Node tree 
+  void SaveNodesBsp(
+			FILE *fph,
+            VFormatOptions &options);
+
+  void SaveNode(
+			int nodeNum, 
+			FILE *fph,
+            VFormatOptions &options); 
+
+
+  void SaveNodeBsp(
+			const dnode_t *node, 
+
+			FILE *fph,
+            VFormatOptions &options);
+
+  void SaveNodeBsp(
+			const dleaf_t *node, 
+
+			FILE *fph,
+            VFormatOptions &options);
+
 };
 
 #endif

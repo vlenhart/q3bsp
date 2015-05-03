@@ -24,45 +24,127 @@
 #include "stringdict.h"
 #include "arglist.h"
 
+// storing info about one blending stage 
+class ShaderStage 
+{
+public :
+
+	ShaderStage() : 
+	    animMapFrequency(1.0f),
+		isLightMap(false),isAnimMap(false),clamp(false),
+		textureBlendMode("ADD")
+	{ 
+	}
+		
+	StringRef map;
+	
+	StringRefVector animMap;
+	float animMapFrequency;
+
+	// blending function 
+	StringRef blendFuncSrc;
+	StringRef blendFuncDst;
+	StringRef alphaFunc;
+	StringRef depthFunc;
+
+
+	String tcmodOk;	// tcmod tokens known, can be used in VRML 
+	String tcmod;	// tcmod tokens 
+
+	String rgbGen;
+
+
+	bool isLightMap;
+	bool isAnimMap;
+	bool clamp;
+
+	// texure blend mode in Multi Texturing 
+    StringRef textureBlendMode;	  // 
+
+};
+
+typedef std::vector<ShaderStage > ShaderStageVector;
+
 class QuakeShader
 {
 public:
   QuakeShader(const StringRef &ref)
   {
     mName = ref;
+	mTrans = false;
+	mNoLightMap = false;
+	mSky = false;
+	mLightMapStage=0;
   };
+  
   const StringRef& GetName(void) const { return mName; };
+  
   void AddTexture(const StringRef& ref)
   {
     String ifoo = ref;
-    if ( ifoo == "chrome_env" ) return;
-    if ( ifoo == "tinfx" ) return;
+    //?if ( ifoo == "chrome_env" ) return;
+    //?if ( ifoo == "tinfx" ) return;
 
     mTextures.push_back(ref);
   };
+
   bool GetBaseTexture(StringRef &ref)
   {
     if ( !mTextures.size() ) return false;
     ref = mTextures[0];
     return true;
   }
+  
+  StringRef mCull;	  // cull property : none
+
+  bool		mTrans;		  // transparent
+
+  bool		mNoLightMap; // no light map
+  bool		mSky;
+
+  int		mLightMapStage; // the stage for the lightmap	
+
+  String	skyBox;
+
+
+  // add an stage 
+  void AddStage (ShaderStage *stage) 
+  {
+	 mStages.push_back(*stage);
+  }	
+
+  int GetNumStages() const  { return mStages.size(); }
+  const ShaderStage& GetStage(int stage) const {return mStages[stage]; }
+
+
 private:
-  StringRef       mName; // name of shader.
-  StringRefVector mTextures;
+  StringRef       mName;		// name of shader.
+  StringRefVector mTextures;	// list of textures 
+  ShaderStageVector mStages;	// list of stages 
 };
 
+
 typedef std::map< StringRef, QuakeShader *> QuakeShaderMap;
+typedef std::map< StringRef, bool > QuakeShaderFileMap;
 
 class QuakeShaderFactory : public ArgList
 {
 public:
+	// where shader files are stored 
+  //char const shaderDir[] = "scripts/";
+  
+
   QuakeShaderFactory(void);
   ~QuakeShaderFactory(void);
 
   QuakeShader * Locate(const String &str);
   QuakeShader * Locate(const StringRef &str);
 
-  void AddShader(const String &sname);
+  bool ShaderFileLoaded(const StringRef &str);
+
+
+  // add a q3 shader file to add all shaders in file to shader list 
+  bool AddShader(const StringRef &sname);
 
 
   static QuakeShaderFactory &gQuakeShaderFactory(void)
@@ -86,13 +168,18 @@ public:
   bool GetName(const String& str,char *stripped);
 
 private:
+
   int          mBraceCount;
+
   QuakeShader *mCurrent;
+  ShaderStage *mCurrentStage;
 
   void ShaderString(const char *str);
 
 
   QuakeShaderMap mShaders; // all shaders available.
+
+  QuakeShaderFileMap mShaderFiles; // all shader files loades 
 
   static QuakeShaderFactory *gSingleton; // global instance of data
 };

@@ -34,6 +34,13 @@ public:
 
   void SwapRGB(unsigned char *dest, const unsigned char *src, unsigned int size);
   void SwapVertically(unsigned char *dest, const unsigned char *src, int wid, int hit, int Bpp);
+
+  /* write a png file */
+  int SavePNG(const char *file_name,const unsigned char *inputdata, int wid, int hit, int Bpp);
+
+  /* convert tga file to  png file */
+  int TGAToPNG(const char *tga_file_name,const char *file_name);
+
 };
 
 

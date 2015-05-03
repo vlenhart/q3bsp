@@ -79,7 +79,7 @@ void ArgList::Copy( const ArgList& copy )
   mArgs = copy.mArgs;
 }
 
-void ArgList::Set( const String& line )
+void ArgList::Set( const String& line, bool untilNewLine )
 {
   enum State
   {
@@ -101,7 +101,7 @@ void ArgList::Set( const String& line )
   {
     int ch = line[index];
 
-    if( ch == '\n' )
+    if(untilNewLine && ch == '\n' )
     {
       break;
     }
