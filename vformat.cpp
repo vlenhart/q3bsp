@@ -27,10 +27,8 @@
 
 
 #include "vformat.h"
-#include "loadbmp.h"
-
-
-//%5.2f
+#include "stb_image.h"
+#include "stb_image_write.h"
 
 // does the file exists ?
 bool ExistsFile(const char *path) 
@@ -78,15 +76,17 @@ void CheckTexture(const char *baseName, String &textureFileName)
 
 	if (ExistsFile(textureFileName.c_str())) {
 		// convert tga to png
-		Bmp bmp;
-
 		String outFileName=baseName;
 		if (ext)  // erase ext 
 			outFileName.erase(outFileName.size()-strlen(ext),strlen(ext));
 
 		outFileName+=".png";
 
-		bmp.TGAToPNG(textureFileName.c_str(),outFileName.c_str());
+		// bmp.TGAToPNG(textureFileName.c_str(),outFileName.c_str());
+		int width, height, comp;
+		unsigned char *data = stbi_load(textureFileName.c_str(), &width, &height, &comp	, 0);
+		stbi_write_png(outFileName.c_str(), width, height, comp, data, width*comp);
+		stbi_image_free(data);
 
 		textureFileName = outFileName;
 		return;
@@ -699,7 +699,7 @@ void VertexSection::SaveVRML2(FILE *fph,VFormatOptions &options)
 			  } 
 			  else {
 				  if (hasLightMap)
-					  fprintf(fph,options.blendMode);
+					  fprintf(fph, "%s", options.blendMode);
 				  else ; // MODULATE 
 			  }					
 			  fprintf(fph,"}");
@@ -821,7 +821,7 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
 	// channel 1
 	fprintf(fph,"\tTextureCoordinate { point [\n\t");
 
-    for (i=0; i<count; i++)
+    for (int i=0; i<count; i++)
     {
       const LightMapVertex &vtx = mVtxs[i];
 

@@ -26,8 +26,7 @@
 #include "patch.h"
 
 #include "fload.h"
-#include "loadbmp.h"
-
+#include "stb_image_write.h"
 
 Quake3BSP::Quake3BSP(const StringRef &fname,
                      const StringRef &code)
@@ -437,22 +436,20 @@ void Quake3BSP::ReadLightmaps(const void *mem)
 
   int texcount = lcount / LMSIZE;
 
-  Bmp bmp;
-
   unsigned char *map = lmaps;
 
   for (int i=0; i<texcount; i++)
   {
     char scratch[256];
-    sprintf(scratch,"%slm%s%02d",mLmPrefix.Get(),mCodeName,i);
+    sprintf(scratch,"%slm%s%02d",mLmPrefix.Get(),mCodeName.Get(),i);
     String sname = scratch;
-	if (mUsePng) {
-		String bname = sname+".png";
-		bmp.SavePNG(bname.c_str(),map,LMWID,LMHIT,3);
-	} else {
-		String bname = sname+".bmp";
-		bmp.SaveBMP(bname.c_str(),map,LMWID,LMHIT,3);
-	}
+    if (mUsePng) {
+      String bname = sname+".png";
+      stbi_write_png(bname.c_str(), LMWID, LMHIT, 3, map, LMWID*3);
+    } else {
+      String bname = sname+".bmp";
+      stbi_write_bmp(bname.c_str(), LMWID, LMHIT, 3, map);
+    }
     map+=LMSIZE;
   }
 
@@ -569,7 +566,7 @@ void QuakeFace::Build(const UShortVector &elements,
 	  if ( strcmp("textures/liquids/lavahell_1000",basetexture) == 0 )  {
 	  }
 	  if ( strstr(basetexture,"lavahell") )  {
-	    printf("shader for : %s\n",basetexture);
+	    printf("shader for : %s\n",basetexture.Get());
 	  }
 
 	// try to load a matching shader from disk 
@@ -584,7 +581,7 @@ void QuakeFace::Build(const UShortVector &elements,
 	}
 
 	if (!shader) {
-	    printf("No shader for : '%s'\n",basetexture);
+	    printf("No shader for : '%s'\n",basetexture.Get());
 
 	}
   }	
@@ -592,16 +589,16 @@ void QuakeFace::Build(const UShortVector &elements,
   // geometry sorted by shader  string
 
   if ( mLightmap < 0 ) // no lightmap
-	  sprintf(scratch,"%s+",basetexture);
+	  sprintf(scratch,"%s+",basetexture.Get());
   else	
-	sprintf(scratch,"%s+%slm%s%02d",basetexture,lmPrefix,
-          code,
+	sprintf(scratch,"%s+%slm%s%02d",basetexture.Get(),lmPrefix.Get(),
+          code.Get(),
           mLightmap);
 
   mat = StringDict::gStringDict().Get(scratch);
 
   char lmapspace[256];
-  sprintf(lmapspace,"lm%s%02d",code,mLightmap);
+  sprintf(lmapspace,"lm%s%02d",code.Get(),mLightmap);
   StringRef lmap = SGET(lmapspace);
 
   switch ( mType )

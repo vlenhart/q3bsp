@@ -46,7 +46,7 @@ Fload::Fload(const String& fname)
         assert( r );
         if ( !r )
         {
-          delete mData;
+          delete (char *) mData;
           mData = 0;
         }
 		((char *)mData)[mLen]=0;
@@ -60,7 +60,7 @@ Fload::Fload(const String& fname)
 
 Fload::~Fload(void)
 {
-  delete mData;
+  delete (char *) mData;
 }
 
 

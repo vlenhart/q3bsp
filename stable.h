@@ -26,9 +26,9 @@
 class CharPtrLess
 {
 public:
-	bool operator()(const char *v1,const char *v2) const
+  bool operator()(const char *v1,const char *v2) const
   {
-    int v = stricmp(v1,v2);
+    int v = strcasecmp(v1,v2);
     if ( v < 0 ) return true;
     return false;
   };

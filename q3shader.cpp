@@ -23,6 +23,7 @@
 
 #include "q3shader.h"
 #include "fload.h"
+#include "main.h"
 
 QuakeShaderFactory *QuakeShaderFactory::gSingleton=0; // global instance of data
 
@@ -157,18 +158,16 @@ bool  QuakeShaderFactory::AddShader(const StringRef &sname)
 
   mCurrentStage = 0;
 
-  Fload shader("scripts/"+String(sname));
+  char filename[1024];
+  sprintf(filename, "scripts/%s", sname.Get());
+  Fload shader(filename);
 
   if (!shader.GetData()) {
+    printf("***********SHADER FILE NOT FOUND in scripts/ : %s \n",sname.c_str());
+    return false;
+  }
 
-	//String sname1;
-	//sname1 = "scripts/" + sname;
-
-	printf("***********SHADER FILE NOT FOUND in scripts/ : %s \n",sname.c_str());
-	return false;;
-  }	
-
-
+  // TODO (vlaube): should we use the full filename here?
   mShaderFiles[sname] = true; 
 
   printf("***********SHADER FILE PROCESS : %s \n",sname.c_str());
@@ -249,12 +248,12 @@ void QuakeShaderFactory::Process(const StringVector &args)
           found = mShaders.find(ref);
           if ( found != mShaders.end() )
           {
-            printf("Can't add shader %s, it already exists!!\n",ref);
+            printf("Can't add shader %s, it already exists!!\n",ref.Get());
           }
           else
           {
             mShaders[ref] = mCurrent;
-            printf("Added shader: %s\n",ref);
+            printf("Added shader: %s\n",ref.Get());
             mCurrent = 0;
           }
         }

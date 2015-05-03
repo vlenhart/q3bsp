@@ -124,7 +124,7 @@ bool PatchSurface::FindSize(int controlx,int controly,const LightMapVertex *cp,i
   sizex = (LEVEL_WIDTH(levelx) - 1) * ((controlx-1) / 2) + 1;
 
 
-  for (int u=0; u <controlx; v++)
+  for (int u=0; u <controlx; u++)
   {
 	  for (int v=0; v < controly; v+=2)
   	{
