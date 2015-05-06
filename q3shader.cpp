@@ -359,8 +359,8 @@ void QuakeShaderFactory::Process(const StringVector &args)
 			}
 			else if ( arg0 == "animmap") {
 				mCurrentStage->isAnimMap = true;
-				mCurrentStage->animMapFrequency = atof(args[1].c_str());
-				for (int i=2; i< args.size(); i++) 
+				mCurrentStage->animMapFrequency = (float)atof(args[1].c_str());
+				for (unsigned int i=2; i< args.size(); i++) 
 					mCurrentStage->animMap.push_back(args[i]);
 			}
 			else if ( arg0 == "blendfunc")
@@ -445,13 +445,13 @@ void QuakeShaderFactory::Process(const StringVector &args)
 				if (mCurrentStage->tcmod.length()>0) 	mCurrentStage->tcmod += ',';
 
 				if (args[1] == "scale" || args[1] == "scroll" || args[1] == "rotate") {
-					for (int i=1; i< args.size(); i++) {
+					for (unsigned int i=1; i< args.size(); i++) {
 						mCurrentStage->tcmodOk += args[i];
 						mCurrentStage->tcmodOk += ' ';
 					}
 
 				} else {
-					for (int i=1; i< args.size(); i++) {
+					for (unsigned int i=1; i< args.size(); i++) {
 						mCurrentStage->tcmod += args[i];
 						mCurrentStage->tcmod += ' ';
 					}
@@ -461,7 +461,7 @@ void QuakeShaderFactory::Process(const StringVector &args)
 			{
 				if (mCurrentStage->tcmod.length()>0) 	mCurrentStage->tcmod += ',';
 				mCurrentStage->tcmod += "tcgen ";
-				for (int i=1; i< args.size(); i++) {
+				for (unsigned int i=1; i< args.size(); i++) {
 					mCurrentStage->tcmod += args[i];
 					mCurrentStage->tcmod += ' ';
 				}
@@ -471,7 +471,7 @@ void QuakeShaderFactory::Process(const StringVector &args)
 				// identityLighting
 				// identity
 				// wave <func> <base> <amp> <phase> <freq>
-				for (int i=1; i< args.size(); i++) {
+				for (unsigned int i=1; i< args.size(); i++) {
 					if (i>1) mCurrentStage->rgbGen += ' ';
 					mCurrentStage->rgbGen += args[i];
 				}

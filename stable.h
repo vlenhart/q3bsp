@@ -22,6 +22,7 @@
 
 #include "stl.h"
 #include <string.h>
+#include "main.h"
 
 class CharPtrLess
 {

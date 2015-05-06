@@ -20,15 +20,8 @@
 //##  Contact John W. Ratcliff at jratcliff@verant.com                      ##
 //############################################################################
 
-
-#pragma warning( disable:4786 )  // warning C4503: '  ' : decorated name length exceeded, name was truncated
-#pragma warning( disable:4503	)
-#pragma warning(disable:4800) // int forced to bool
-
-
 #include <string>
 #include <map>
-//#include <hash_map>
 #include <vector>
 #include <set>
 #include <list>

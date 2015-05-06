@@ -584,7 +584,7 @@ void VertexSection::SaveVRML2(FILE *fph,VFormatOptions &options)
 				if (stage.isAnimMap) {
 					if (options.useEffects) {
 						fprintf(fph,"DEF MAP AnimMap {\nfrequency %f textures [\n",stage.animMapFrequency);
-						for (int i=0; i<stage.animMap.size(); i++)
+						for (unsigned int i=0; i<stage.animMap.size(); i++)
 							WriteImageTexture(fph,stage.animMap[i],options,false,stage.clamp);
 
 						//fprintf(fph,"] ROUTE TIMER.fraction_changed TO MAP.set_fraction \n");

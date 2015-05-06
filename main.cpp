@@ -35,8 +35,8 @@ int  main(int argc,char **argv)
 {
 
   VFormatOptions option;
-  const char *options=NULL;
-  const char *fileArg = NULL;
+  char *options=NULL;
+  char *fileArg = NULL;
   
   int argi=1;	// the current argument 
 
