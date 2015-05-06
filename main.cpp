@@ -45,10 +45,6 @@ int  main(int argc,char **argv)
 	  argi++;
   }	
 
-  // Usage: q3bsp [-options] <name>.BSP
-
-  // option.useMat = true;
-
   if ( argi >= argc )
   {
     printf("Usage: q3bsp [-options] <name>.BSP\n");
@@ -102,6 +98,8 @@ int  main(int argc,char **argv)
 	  if (strchr(options,'v'))
 			option.verbose = true;
 
+	  if (strchr(options,'n'))
+			option.noTextureCoordinates = true;
 
   }	
   

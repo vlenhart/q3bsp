@@ -839,7 +839,7 @@ void VertexPool::SaveVRML2(FILE *fph, int lightMapStage, VFormatOptions &options
 
 
   } else	
-  if ( 0 ) // TODO(vlaube): only disabled because the vrml loader cannot parse textures
+  if ( options.noTextureCoordinates )
   {
     fprintf(fph,"texCoord  TextureCoordinate {\npoint [\n\t");
     int count = mVtxs.size();

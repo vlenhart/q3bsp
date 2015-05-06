@@ -62,6 +62,7 @@ public :
 	bool useMat; // dim world using mat emissive color
 	bool useEffects; // emit special effects 
 	bool yzFlip; // true VRML Y <=> Z 
+  bool noTextureCoordinates; // do not output texture coordinates for vrml2 files
 
 	// printf format for vertex coordinates
 	const char * VFORMAT;
