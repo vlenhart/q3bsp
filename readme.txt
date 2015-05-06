@@ -1,4 +1,4 @@
-							 Q3BSP v1.1
+                             Q3BSP v1.1
 
                              Q3BSP v1.0
 
@@ -10,13 +10,13 @@
                       Open Sourced December 5, 2000
                            Merry Christmas
 
-						   v1.1 / VRML 97
-								by
+                           v1.1 / VRML 97
+                                by
                            Holger Grahn
-							hg@x79.net
+                            hg@x79.net
 
 
-Q3BSP is a Windows console application that will convert any valid
+Q3BSP is a cross-platform console application that will convert any valid
 Quake 3 BSP file into an organized polygon mesh and export the results
 into a standardized ASCII file format, VRML 1.0.  I encourage users of
 this software to expand this tool to export in other popular ASCII file
@@ -32,7 +32,7 @@ all lightmap information.  You can then directly import these files
 into any number of 3d editing tools, including 3d Studio Max
 
 This tool also extracts the lightmap data and saves it out as a
-series of .BMP files.
+series of .PNG files.
 
 Contact Id Software about using Quake 3 data files and Quake 3 editing
 tools for commercial software development projects.
@@ -42,8 +42,7 @@ used.  I have not included the Quake 3 shader files with this build, but
 you can copy them into the working directory yourself.
 
 This source code makes heavy use of C++ and STL.  It is mostly OS
-neutral and should compile fairly easily on any system, with the exception
-of the utility LOADBMP.CPP which is Windows specific.
+neutral and should compile fairly easily on any system.
 
 
 This project was created with Microsoft Developer Studio 6.0 and all
@@ -58,10 +57,10 @@ arglist.cpp       arguments.
 fload.h           Utility class to load a file from disk into memory.
 fload.cpp
 
-loadbmp.h         Utility class to load and save .BMP files.  This is
-loadbmp.cpp       OS specific to Windows.
+Makefile          You can use this to compile with the make utility.
 
 main.cpp          Main console application.
+main.cpp          Some helper functions for cross-platform compatiblity.
 
 patch.h           Converts a Quake 3 Bezier patch into a set of
 patch.cpp         triangles.
@@ -76,14 +75,21 @@ q3bsp.dsw         Dev Studio Workspace
 
 q3def.h           Data definitions for Quake 3 data structures.
 
-q3shader.h        Utility to parse Quake 3 shader files
+q3effects.wrl     Some Quake 3 shader effects emulation.
+
+q3shader.h        Utility to parse Quake 3 shader files.
 q3shader.cpp
+
+qdefs.h           Misc definitions compatible with Q3.
 
 rect.h            Simple template class to represent an axis aligned
                   bounding region.
 
 stable.h          Simple class to maintain a set of ascii strings with
                   no duplications.
+
+stb_image_write.h Cross-platform image reading and writing.
+stb_image.h
 
 stl.h             Includes common STL header files.
 
@@ -110,9 +116,6 @@ This extensions is supported by blaxxun Contact 5 VRML plugin.
 In the directory the file q3effects.wrl
 is copied into the output file.
 The additional option v puts the shader name as string after each Appearance.
-
-The project now includes the lastest libPNG & zlib libaries, the build configuration
-Win32 LIB debug & WIN32 LIB need to be build manually before building q3bsp.
 
 
 The output was tested the following way :
