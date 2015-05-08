@@ -167,7 +167,7 @@ int  main(int argc,char **argv)
 					printf("***********q3effects.wrl NOT FOUND\n");
 				}
 				else {
-					fprintf(fph,"%s\n",effects.GetData());
+					fprintf(fph,"%s\n",(char *)effects.GetData());
 					option.matDefined = true; // assume MAT is defined in this file
 				}
 			}
